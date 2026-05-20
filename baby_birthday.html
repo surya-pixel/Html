@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! 💖</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- Base & Reset --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #ffb3c6, #ffccd5, #fff0f3, #ffc2d1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #333;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* --- Floating Elements --- */
+        #hearts-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .heart {
+            position: absolute; bottom: -10vh;
+            color: rgba(255, 105, 180, 0.7);
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-110vh) scale(1.5) rotate(360deg); opacity: 0; }
+        }
+        
+        /* --- Screens --- */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease-in-out, visibility 1s ease-in-out; padding: 20px;
+        }
+        #screen-1 { opacity: 1; visibility: visible; z-index: 10; }
+        #screen-2 {
+            opacity: 0; visibility: hidden; z-index: 5;
+            justify-content: flex-start; padding-top: 5vh; padding-bottom: 5vh; display: none;
+        }
+        #screen-3, #screen-4 {
+            opacity: 0; visibility: hidden; z-index: 5; display: none; text-align: center;
+        }
+        .hidden { opacity: 0 !important; visibility: hidden !important; }
+        .visible { opacity: 1 !important; visibility: visible !important; z-index: 20 !important; position: relative !important; }
+        
+        /* --- Typography --- */
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            color: #d1498b;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px; text-align: center; line-height: 1.2;
+            z-index: 2;
+        }
+        p {
+            font-size: 1.2rem; color: #d1498b; font-weight: 600;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px; border-radius: 30px; margin-top: 30px;
+            animation: pulse 2s infinite; text-align: center;
+            z-index: 2;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        /* --- Gift Icon --- */
+        .gift-wrapper {
+            position: relative;
+            z-index: 15;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            padding: 20px;
+        }
+        
+        .gift-box {
+            font-size: clamp(6rem, 15vw, 10rem); cursor: pointer; user-select: none;
+            animation: bounce 2s infinite; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+        }
+        .gift-box:hover { transform: scale(1.15); animation-play-state: paused; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+        
+        /* --- Gallery --- */
+        .gallery {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px; width: 100%; max-width: 1000px; margin-top: 20px;
+        }
+        .polaroid {
+            background: #fff; padding: 15px 15px 30px 15px; border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.4); 
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s;
+            display: flex; flex-direction: column; position: relative; z-index: 10;
+        }
+        .polaroid img {
+            width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
+            background: #ffe4e1; border-radius: 6px; 
+        }
+        .polaroid:nth-child(1) { transform: rotate(-3deg); }
+        .polaroid:nth-child(2) { transform: rotate(2deg) translateY(10px); }
+        .polaroid:nth-child(3) { transform: rotate(-2deg); }
+        .polaroid:hover, .polaroid:active { 
+            transform: scale(1.05) rotate(0deg) translateY(-5px); 
+            box-shadow: 0 12px 25px rgba(209, 73, 139, 0.3); z-index: 20; 
+        }
+        .nav-buttons {
+            display: flex; gap: 20px; margin-top: 50px; margin-bottom: 30px;
+            justify-content: center; width: 100%; z-index: 10; position: relative;
+        }
+        .btn {
+            font-family: 'Poppins', sans-serif; font-size: 1.2rem; font-weight: 600;
+            padding: 12px 30px; border: none; border-radius: 30px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(209, 73, 139, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-outline { background: white; color: #d1498b; border: 2px solid #d1498b; }
+        .btn-outline:hover { background: #fff0f3; }
+        .btn-primary { background: #d1498b; color: white; }
+        .btn-primary:hover { background: #b03872; }
+        .valentine-actions {
+            display: flex; gap: 20px; margin-top: 40px; align-items: center; justify-content: center; z-index: 10; position: relative;
+        }
+        #yes-btn {
+            background: #ff4d6d; color: white; padding: 15px 40px; font-size: 1.5rem;
+            border-radius: 50px; border: none; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: pulse 2s infinite; 
+        }
+        #no-btn {
+            background: #8d99ae; color: white; padding: 15px 40px; font-size: 1.5rem;
+            border-radius: 50px; border: none; cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        #val-subtext {
+            min-height: 40px; margin-top: 20px; font-size: 1.5rem;
+            color: #d90429; background: none; animation: none; font-weight: 600; z-index: 10; position: relative;
+        }
+        .cute-gif {
+            width: 200px; border-radius: 20px; margin: 20px auto; display: block;
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3); pointer-events: none; z-index: 10; position: relative;
+        }
+        .fallback-emoji { display: none; font-size: 5rem; margin-top: 20px; animation: pulse 2s infinite; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="hearts-container"></div>
+
+    <div id="screen-1" class="screen">
+        <h1 style="font-size: clamp(2.5rem, 8vw, 5rem);">Happy Birthday MY LOVE 🩷🌷</h1>
+        <div class="gift-wrapper">
+            <div class="gift-box" id="gift-btn">🎁</div>
+        </div>
+        <p>Click the gift for your surprise! 🎁</p>
+    </div>
+
+    <div id="screen-2" class="screen">
+        <h1 style="font-size: clamp(2.5rem, 6vw, 4.5rem);">This life feels right with YOU MY LOVE 🩷</h1>
+        <div class="gallery">
+            <div class="polaroid">
+                <img src="1000142906.png" alt="Memory 1">
+            </div>
+            <div class="polaroid">
+                <img src="1000139294.png" alt="Memory 2">
+            </div>
+            <div class="polaroid">
+                <img src="1000142016.jpg" alt="Memory 3">
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline" id="back-btn">⬅️ Back</button>
+            <button class="btn btn-primary" id="next-btn">Next ➡️</button>
+        </div>
+    </div>
+
+    <div id="screen-3" class="screen">
+        <h1 id="val-question">Will you be my Valentine? 🥺</h1>
+        <div class="valentine-actions">
+            <button id="yes-btn">Yes! 💖</button>
+            <button id="no-btn">No 💔</button>
+        </div>
+        <div id="val-subtext"></div>
+    </div>
+
+    <div id="screen-4" class="screen">
+        <h1>Yaaaay! 🎉</h1>
+        <p style="font-size: 1.5rem; background: rgba(255,255,255,0.9); border-radius: 20px; padding: 15px 30px;">
+            You're my Valentine now forever! 🥰💖🌷
+        </p>
+        <img src="https://media1.tenor.com/m/aKFaZBrZHY0AAAAC/bubu-dudu-bubu.gif" alt="Cute hugging bears" class="cute-gif" onerror="this.style.display='none'; document.getElementById('fallback-emoji').style.display='block';">
+        <div id="fallback-emoji" class="fallback-emoji">🧸💖🐱</div>
+    </div>
+
+    <script>
+        const heartsContainer = document.getElementById('hearts-container');
+        const heartSymbols = ['💖', '💕', '💗', '🌸', '✨', '🧸', '🦋', '🌷', '🎀', '💘', '💝'];
+        const numHearts = 50; 
+
+        for (let i = 0; i < numHearts; i++) {
+            const element = document.createElement('div');
+            element.classList.add('heart');
+            element.innerText = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+            element.style.left = Math.random() * 100 + 'vw';
+            element.style.fontSize = (Math.random() * 2 + 1) + 'rem';
+            element.style.animationDuration = (Math.random() * 6 + 4) + 's';
+            element.style.animationDelay = (Math.random() * 10) + 's';
+            heartsContainer.appendChild(element);
+        }
+
+        const giftBtn = document.getElementById('gift-btn');
+        const backBtn = document.getElementById('back-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const screen1 = document.getElementById('screen-1');
+        const screen2 = document.getElementById('screen-2');
+        const screen3 = document.getElementById('screen-3');
+        const screen4 = document.getElementById('screen-4');
+
+        giftBtn.addEventListener('click', () => { triggerConfetti(false); transitionScreens(screen1, screen2); });
+        backBtn.addEventListener('click', () => { transitionScreens(screen2, screen1); });
+        nextBtn.addEventListener('click', () => { transitionScreens(screen2, screen3); });
+
+        function transitionScreens(hideScreen, showScreen) {
+            hideScreen.classList.add('hidden');
+            hideScreen.classList.remove('visible');
+            setTimeout(() => {
+                hideScreen.style.display = 'none';
+                showScreen.style.display = 'flex';
+                setTimeout(() => {
+                    showScreen.classList.remove('hidden');
+                    showScreen.classList.add('visible');
+                }, 50);
+            }, 1000);
+        }
+
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        const valSubtext = document.getElementById('val-subtext');
+        
+        let noClickCount = 0;
+        const emotionalTexts = [
+            "Are you sure? 🥺", "Really really sure? 🥹", "Please click Yes! 😭", 
+            "Don't break my heart! 💔", "I'm going to cry... 🥺🥹", "You have no choice! 💖"
+        ];
+
+        noBtn.addEventListener('click', () => {
+            noClickCount++;
+            const textIndex = Math.min(noClickCount - 1, emotionalTexts.length - 1);
+            valSubtext.innerText = emotionalTexts[textIndex];
+            const scaleAmount = 1 + (noClickCount * 0.4); 
+            yesBtn.style.transform = `scale(${scaleAmount})`;
+            yesBtn.style.animation = 'none'; 
+            const noScaleAmount = Math.max(0.3, 1 - (noClickCount * 0.15));
+            noBtn.style.transform = `scale(${noScaleAmount})`;
+        });
+
+        yesBtn.addEventListener('click', () => { triggerConfetti(true); transitionScreens(screen3, screen4); });
+
+        function triggerConfetti(isFinal = false) {
+            const duration = isFinal ? 2000 : 1500; 
+            const end = Date.now() + duration;
+            confetti({
+                particleCount: isFinal ? 80 : 40, spread: isFinal ? 80 : 50, origin: { y: 0.6 },
+                colors: ['#ffb3c6', '#ffccd5', '#d1498b', '#ffffff', '#ff4d6d'], disableForReducedMotion: true
+            });
+            (function frame() {
+                confetti({ particleCount: 2, angle: 60, spread: 40, origin: { x: 0 }, colors: ['#ffb3c6', '#ffccd5', '#d1498b', '#ffffff'] });
+                confetti({ particleCount: 2, angle: 120, spread: 40, origin: { x: 1 }, colors: ['#ffb3c6', '#ffccd5', '#d1498b', '#ffffff'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
